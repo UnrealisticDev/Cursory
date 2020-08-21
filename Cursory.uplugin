@@ -1,0 +1,32 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Cursory",
+	"Description": "An advanced hardware cursor system.",
+	"Category": "Input",
+	"CreatedBy": "Mowgl33",
+	"CreatedByURL": "https://unrealistic.dev/",
+	"DocsURL": "https://unrealistic.dev/products/cursory/",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/8a287c28f91e495bbf36a334ff731fd5",
+	"SupportURL": "https://forums.unrealengine.com/unreal-engine/marketplace/1802550-cursory-hardware-cursors",
+	"EngineVersion": "4.25.0",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "Cursory",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win32",
+				"Win64",
+				"Mac",
+				"Linux",
+				"AllDesktop"
+			]
+		}
+	]
+}
