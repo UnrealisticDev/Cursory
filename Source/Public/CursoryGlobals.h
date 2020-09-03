@@ -19,19 +19,19 @@ struct FCursorInfo
 public:
 
 	/** The identifying tag for this cursor. */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Info)
 	FGameplayTag Identifier;
 
 	/** The path to this cursor (relative to the game's Content directory). 
 	 *	For example, Slate/Cursors/coolcursor. Leave out file extensions. */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Info)
 	FString Path;
 
 	/** A coordinate representing the operative point of a cursor, relative to the top-left.
 	 *	Coordinates should be normalized (between 0..1). For example, a typical crosshair would have a Hotspot of (0.5, 0.5). 
 	 *	Some cursor file types (.ani, .cur) have hotspots encoded. In this case, the file hotspot will control.
 	 *	This value will only be used for other image types that do not provide hotspots (.tiff, .png). */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Info)
 	FVector2D Hotspot;
 
 	/** Allows using this struct as a TSet/TMap key. */
