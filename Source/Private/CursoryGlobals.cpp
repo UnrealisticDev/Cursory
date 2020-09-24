@@ -34,7 +34,10 @@ void UCursoryGlobals::Init()
 	// Load cursors once on Engine init.
 	FCoreDelegates::OnPostEngineInit.AddWeakLambda(this, [this]()
 	{
-		LoadCursors();
+		if (FSlateApplication::IsInitialized())
+		{
+			LoadCursors();
+		}
 	});
 
 #if WITH_EDITOR
