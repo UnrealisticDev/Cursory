@@ -20,13 +20,17 @@ class UCursoryFunctionLibrary : public UBlueprintFunctionLibrary
 
 public:
 
-	/** Sets the first player's hardware cursor to one of the standard types.
-	 *	Do not use this to set the cursor to Custom. */
+	/** 
+	 * Sets the first player's hardware cursor to one of the standard types.
+	 * Do not use this to set the cursor to Custom. 
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Cursory", meta = (WorldContext = "WorldContextObject"))
 	static void UseStandardCursor(const UObject* WorldContextObject, EMouseCursor::Type Cursor);
 
-	/** Set the first player's hardware cursor to the specified
-	 *	custom cursor. */
+	/** 
+	 * Set the first player's hardware cursor to the specified
+	 * custom cursor. 
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Cursory", meta = (WorldContext = "WorldContextObject"))
 	static void UseCustomCursor(const UObject* WorldContextObject, FGameplayTag Identifier);
 };

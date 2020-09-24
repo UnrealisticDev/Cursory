@@ -22,15 +22,19 @@ public:
 	UPROPERTY(EditAnywhere, Category = Info)
 	FGameplayTag Identifier;
 
-	/** The path to this cursor (relative to the game's Content directory). 
-	 *	For example, Slate/Cursors/coolcursor. Leave out file extensions. */
+	/** 
+	 * The path to this cursor (relative to the game's Content directory). 
+	 * For example, Slate/Cursors/coolcursor. Leave out file extensions. 
+	 */
 	UPROPERTY(EditAnywhere, Category = Info)
 	FString Path;
 
-	/** A coordinate representing the operative point of a cursor, relative to the top-left.
-	 *	Coordinates should be normalized (between 0..1). For example, a typical crosshair would have a Hotspot of (0.5, 0.5). 
-	 *	Some cursor file types (.ani, .cur) have hotspots encoded. In this case, the file hotspot will control.
-	 *	This value will only be used for other image types that do not provide hotspots (.tiff, .png). */
+	/** 
+	 * A coordinate representing the operative point of a cursor, relative to the top-left.
+	 * Coordinates should be normalized (between 0..1). For example, a typical crosshair would have a Hotspot of (0.5, 0.5). 
+	 * Some cursor file types (.ani, .cur) have hotspots encoded. In this case, the file hotspot will control.
+	 * This value will only be used for other image types that do not provide hotspots (.tiff, .png).
+	 */
 	UPROPERTY(EditAnywhere, Category = Info)
 	FVector2D Hotspot;
 
@@ -83,17 +87,21 @@ public:
 	*
 	************************************************************************/
 
-	/** Initializes the globals,
-	 *	listening for Engine init to start loading cursors. */
+	/** 
+	 * Initializes the globals object,
+	 * listening for Engine init to start loading cursors. 
+	 */
 	void Init();
 
 private:
 
-	/** Loads all specified cursors on Engine startup. 
-	 *	Load priority:
-	 *	- Windows: .ani -> .cur -> .png
-	 *	- Mac: .tiff -> .png 
-	 *	- Linux: .png */
+	/** 
+	 * Loads all specified cursors on Engine startup. 
+	 * Load priority:
+	 * - Windows: .ani -> .cur -> .png
+	 * - Mac: .tiff -> .png 
+	 * - Linux: .png 
+	 */
 	void LoadCursors();
 
 	/************************************************************************
@@ -113,8 +121,10 @@ public:
 	/** Returns the identifier for the currently mounted custom cursor. */
 	FGameplayTag GetMountedCustomCursor() const;
 
-	/** Mounts the specified cursor for the platform's MouseCursor::Custom. 
-	 *	Player must set their CurrentMouseCursor to Custom to see the effect. */
+	/** 
+	 * Mounts the specified cursor for the platform's MouseCursor::Custom. 
+	 * Player must set their CurrentMouseCursor to Custom to see the effect. 
+	 */
 	void MountCustomCursor(FGameplayTag& Identifier);
 
 private:
