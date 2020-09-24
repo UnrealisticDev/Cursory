@@ -16,25 +16,25 @@ void UCursoryFunctionLibrary::UseStandardCursor(const UObject* WorldContextObjec
 		return;
 	}
 
-	auto playerOne = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
-	if (!playerOne)
+	APlayerController* PlayerOne = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
+	if (!PlayerOne)
 	{
 		UE_LOG(LogCursory, Warning, TEXT("Could not find player to use cursor on."));
 		return;
 	}
 
-	playerOne->CurrentMouseCursor = Cursor;
+	PlayerOne->CurrentMouseCursor = Cursor;
 }
 
 void UCursoryFunctionLibrary::UseCustomCursor(const UObject* WorldContextObject, FGameplayTag Identifier)
 {
-	auto playerOne = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
-	if (!playerOne)
+	APlayerController* PlayerOne = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
+	if (!PlayerOne)
 	{
 		UE_LOG(LogCursory, Warning, TEXT("Could not find player to use cursor on."));
 		return;
 	}
 
 	ICursoryModule::Get().GetGlobals()->MountCustomCursor(Identifier);
-	playerOne->CurrentMouseCursor = EMouseCursor::Custom;
+	PlayerOne->CurrentMouseCursor = EMouseCursor::Custom;
 }

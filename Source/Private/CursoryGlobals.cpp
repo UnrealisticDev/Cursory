@@ -53,8 +53,10 @@ void UCursoryGlobals::Init()
 
 struct FPNGConverter
 {
-	/** Describes PNG file data that can be used to
-	*	create a cursor. */
+	/** 
+	 * Describes PNG file data that can be used to
+	 * create a cursor. 
+	 */
 	struct FPngFileData
 	{
 		FString FileName;
@@ -74,36 +76,36 @@ struct FPNGConverter
 			return nullptr;
 		}
 
-		TArray<TSharedPtr<FPngFileData>> cursorPngFiles;
-		if (!LoadAvailableCursorPngs(cursorPngFiles, InPathToCursorWithoutExtension))
+		TArray<TSharedPtr<FPngFileData>> CursorPngFiles;
+		if (!LoadAvailableCursorPngs(CursorPngFiles, InPathToCursorWithoutExtension))
 		{
 			return nullptr;
 		}
 
-		check(cursorPngFiles.Num() > 0);
-		TSharedPtr<FPngFileData> nearestCursor = cursorPngFiles[0];
-		float platformScaleFactor = FPlatformApplicationMisc::GetDPIScaleFactorAtPoint(0, 0);
-		for (TSharedPtr<FPngFileData>& fileData : cursorPngFiles)
+		check(CursorPngFiles.Num() > 0);
+		TSharedPtr<FPngFileData> NearestCursor = CursorPngFiles[0];
+		float PlatformScaleFactor = FPlatformApplicationMisc::GetDPIScaleFactorAtPoint(0, 0);
+		for (TSharedPtr<FPngFileData>& FileData : CursorPngFiles)
 		{
-			const float newDelta = FMath::Abs(fileData->ScaleFactor - platformScaleFactor);
-			if (newDelta < FMath::Abs(nearestCursor->ScaleFactor - platformScaleFactor))
+			const float NewDelta = FMath::Abs(FileData->ScaleFactor - PlatformScaleFactor);
+			if (NewDelta < FMath::Abs(NearestCursor->ScaleFactor - PlatformScaleFactor))
 			{
-				nearestCursor = fileData;
+				NearestCursor = FileData;
 			}
 		}
 
-		IImageWrapperModule& imageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-		TSharedPtr<IImageWrapper>pngImageWrapper = imageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
+		IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+		TSharedPtr<IImageWrapper>PngImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
 
-		if (pngImageWrapper.IsValid() && pngImageWrapper->SetCompressed(nearestCursor->FileData.GetData(), nearestCursor->FileData.Num()))
+		if (PngImageWrapper.IsValid() && PngImageWrapper->SetCompressed(NearestCursor->FileData.GetData(), NearestCursor->FileData.Num()))
 		{
-			TArray64<uint8> rawImageData;
-			if (pngImageWrapper->GetRaw(ERGBFormat::RGBA, 8, rawImageData))
+			TArray64<uint8> RawImageData;
+			if (PngImageWrapper->GetRaw(ERGBFormat::RGBA, 8, RawImageData))
 			{
-				const int32 width = pngImageWrapper->GetWidth();
-				const int32 height = pngImageWrapper->GetHeight();
+				const int32 Width = PngImageWrapper->GetWidth();
+				const int32 Height = PngImageWrapper->GetHeight();
 
-				return PlatformCursor.CreateCursorFromRGBABuffer((FColor*)rawImageData.GetData(), width, height, InHotSpot);
+				return PlatformCursor.CreateCursorFromRGBABuffer((FColor*)RawImageData.GetData(), Width, Height, InHotSpot);
 			}
 		}
 
@@ -112,49 +114,49 @@ struct FPNGConverter
 
 	static bool LoadAvailableCursorPngs(TArray<TSharedPtr<FPngFileData>>& Results, const FString& InPathToCursorWithoutExtension)
 	{
-		FString cursorsWithSizeSearch = FPaths::GetCleanFilename(InPathToCursorWithoutExtension) + TEXT("*.png");
+		FString CursorsWithSizeSearch = FPaths::GetCleanFilename(InPathToCursorWithoutExtension) + TEXT("*.png");
 
-		TArray<FString> pngCursorFiles;
-		IFileManager::Get().FindFilesRecursive(pngCursorFiles, *FPaths::GetPath(InPathToCursorWithoutExtension), *cursorsWithSizeSearch, true, false, false);
+		TArray<FString> PngCursorFiles;
+		IFileManager::Get().FindFilesRecursive(PngCursorFiles, *FPaths::GetPath(InPathToCursorWithoutExtension), *CursorsWithSizeSearch, true, false, false);
 
 		bool bFoundCursor = false;
 
-		for (const FString& fullCursorPath : pngCursorFiles)
+		for (const FString& FullCursorPath : PngCursorFiles)
 		{
-			FString cursorFile = FPaths::GetBaseFilename(fullCursorPath);
+			FString CursorFile = FPaths::GetBaseFilename(FullCursorPath);
 
-			FString dummy;
-			FString scaleFactorSection;
-			FString scaleFactor;
+			FString Dummy;
+			FString ScaleFactorSection;
+			FString ScaleFactor;
 
-			if (cursorFile.Split(TEXT("@"), &dummy, &scaleFactorSection, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
+			if (CursorFile.Split(TEXT("@"), &Dummy, &ScaleFactorSection, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
 			{
-				if (scaleFactorSection.Split(TEXT("x"), &scaleFactor, &dummy) == false)
+				if (ScaleFactorSection.Split(TEXT("x"), &ScaleFactor, &Dummy) == false)
 				{
-					scaleFactor = scaleFactorSection;
+					ScaleFactor = ScaleFactorSection;
 				}
 			}
 			else
 			{
-				scaleFactor = TEXT("1");
+				ScaleFactor = TEXT("1");
 			}
 
-			if (FCString::IsNumeric(*scaleFactor) == false)
+			if (FCString::IsNumeric(*ScaleFactor) == false)
 			{
-				UE_LOG(LogInit, Error, TEXT("Failed to load cursor '%s', non-numeric characters in the scale factor."), *fullCursorPath);
+				UE_LOG(LogInit, Error, TEXT("Failed to load cursor '%s', non-numeric characters in the scale factor."), *FullCursorPath);
 				continue;
 			}
 
-			TSharedPtr<FPngFileData> pngFileData = MakeShared<FPngFileData>();
-			pngFileData->FileName = fullCursorPath;
-			pngFileData->ScaleFactor = FCString::Atof(*scaleFactor);
+			TSharedPtr<FPngFileData> PngFileData = MakeShared<FPngFileData>();
+			PngFileData->FileName = FullCursorPath;
+			PngFileData->ScaleFactor = FCString::Atof(*ScaleFactor);
 
-			if (FFileHelper::LoadFileToArray(pngFileData->FileData, *fullCursorPath, FILEREAD_Silent))
+			if (FFileHelper::LoadFileToArray(PngFileData->FileData, *FullCursorPath, FILEREAD_Silent))
 			{
-				UE_LOG(LogInit, Log, TEXT("Loading Cursor '%s'."), *fullCursorPath);
+				UE_LOG(LogInit, Log, TEXT("Loading Cursor '%s'."), *FullCursorPath);
 			}
 
-			Results.Add(pngFileData);
+			Results.Add(PngFileData);
 
 			bFoundCursor = true;
 		}
@@ -172,34 +174,34 @@ void UCursoryGlobals::LoadCursors()
 {
 	LoadedCursors.Reset();
 
-	TSharedPtr<ICursor> platformCursor = FSlateApplication::Get().GetPlatformCursor();
+	TSharedPtr<ICursor> PlatformCursor = FSlateApplication::Get().GetPlatformCursor();
 
 	// Iterate through specs and load cursor handles.
-	for (auto& cur : CursorSpecs)
+	for (FCursorInfo& CursorSpec : CursorSpecs)
 	{
 		// Validate hot spot.
-		auto& hotspot = cur.Hotspot;
-		ensure(hotspot.X >= 0.0f && hotspot.X <= 1.0f);
-		ensure(hotspot.Y >= 0.0f && hotspot.Y <= 1.0f);
-		hotspot.X = FMath::Clamp(hotspot.X, 0.0f, 1.0f);
-		hotspot.Y = FMath::Clamp(hotspot.Y, 0.0f, 1.0f);
+		FVector2D& Hotspot = CursorSpec.Hotspot;
+		ensure(Hotspot.X >= 0.0f && Hotspot.X <= 1.0f);
+		ensure(Hotspot.Y >= 0.0f && Hotspot.Y <= 1.0f);
+		Hotspot.X = FMath::Clamp(Hotspot.X, 0.0f, 1.0f);
+		Hotspot.Y = FMath::Clamp(Hotspot.Y, 0.0f, 1.0f);
 
 		// Create the cursor on the platform.
-		FString cursorFullPath = FPaths::ProjectContentDir() / cur.Path;
-		auto hardwareCursor = platformCursor->CreateCursorFromFile(cursorFullPath, hotspot);
-		if (!hardwareCursor)
+		FString CursorFullPath = FPaths::ProjectContentDir() / CursorSpec.Path;
+		void* HardwareCursor = PlatformCursor->CreateCursorFromFile(CursorFullPath, Hotspot);
+		if (!HardwareCursor)
 		{
 			// Fallback to PNG loading.
-			hardwareCursor = FPNGConverter::LoadCursorsFromPngs(*platformCursor, cursorFullPath, hotspot);
-			if (!hardwareCursor)
+			HardwareCursor = FPNGConverter::LoadCursorsFromPngs(*PlatformCursor, CursorFullPath, Hotspot);
+			if (!HardwareCursor)
 			{
-				UE_LOG(LogCursory, Warning, TEXT("Failed to load hardware cursor [%s] located at [%s]."), *cur.Identifier.ToString(), *cursorFullPath);
+				UE_LOG(LogCursory, Warning, TEXT("Failed to load hardware cursor [%s] located at [%s]."), *CursorSpec.Identifier.ToString(), *CursorFullPath);
 				continue;
 			}
 		}
 
 		// Save cursor handle.
-		LoadedCursors.Add(cur.Identifier, hardwareCursor);
+		LoadedCursors.Add(CursorSpec.Identifier, HardwareCursor);
 	}
 }
 
@@ -210,12 +212,12 @@ int32 UCursoryGlobals::GetCustomCursorCount() const
 
 FGameplayTagContainer UCursoryGlobals::GetCustomCursorOptions() const
 {
-	auto options = FGameplayTagContainer();
-	for (const auto& loadedCursor : LoadedCursors) 
+	FGameplayTagContainer Options;
+	for (const auto& LoadedCursorPair : LoadedCursors) 
 	{
-		options.AddTag(loadedCursor.Key);
+		Options.AddTag(LoadedCursorPair.Key);
 	}
-	return options;
+	return Options;
 }
 
 FGameplayTag UCursoryGlobals::GetMountedCustomCursor() const
@@ -225,10 +227,10 @@ FGameplayTag UCursoryGlobals::GetMountedCustomCursor() const
 
 void UCursoryGlobals::MountCustomCursor(FGameplayTag& Identifier)
 {
-	if (auto cursor = LoadedCursors.Find(Identifier))
+	if (auto Cursor = LoadedCursors.Find(Identifier))
 	{
 		MountedCursor = Identifier;
-		FSlateApplication::Get().GetPlatformCursor()->SetTypeShape(EMouseCursor::Custom, *cursor);
+		FSlateApplication::Get().GetPlatformCursor()->SetTypeShape(EMouseCursor::Custom, *Cursor);
 	}
 
 	else
