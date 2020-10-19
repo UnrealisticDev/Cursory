@@ -14,11 +14,15 @@
 #if WITH_EDITOR
 #include "Editor.h"
 #endif
+#include "Widgets/SWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
 #define LOCTEXT_NAMESPACE "CursoryGlobals"
 
 UCursoryGlobals::UCursoryGlobals(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
+	, bCursorOverridenByWidget(false)
+	, bAutoFocusViewport(true)
 {
 	// Stub
 }
@@ -37,6 +41,7 @@ void UCursoryGlobals::Init()
 		if (FSlateApplication::IsInitialized())
 		{
 			LoadCursors();
+			MonitorViewportStatus();
 		}
 	});
 
@@ -205,6 +210,34 @@ void UCursoryGlobals::LoadCursors()
 	}
 }
 
+void UCursoryGlobals::MonitorViewportStatus()
+{
+	FSlateApplication::Get().OnPreTick().AddUObject(this, &UCursoryGlobals::AuditViewportStatus);
+}
+
+void UCursoryGlobals::AuditViewportStatus(float DeltaSeconds)
+{
+	FSlateApplication& SlateApp = FSlateApplication::Get();
+	SWidget* GameViewport = SlateApp.GetGameViewport().Get();
+
+	if (GameViewport && GameViewport->IsDirectlyHovered())
+	{
+		// Always revert after rolling off a widget, doesn't matter if focused
+		// (Hovering a widget doesn't necessarily take focus)
+		if (bCursorOverridenByWidget)
+		{
+			RevertCustomCursorToPlayer();
+		}
+
+		// If viewport lost focus along the way, restore focus
+		// (Clicking a widget may take focus)
+		if (bAutoFocusViewport && !GameViewport->HasUserFocus(0).IsSet())
+		{
+			UWidgetBlueprintLibrary::SetFocusToGameViewport();
+		}
+	}
+}
+
 int32 UCursoryGlobals::GetCustomCursorCount() const
 {
 	return LoadedCursors.Num();
@@ -222,14 +255,24 @@ FGameplayTagContainer UCursoryGlobals::GetCustomCursorOptions() const
 
 FGameplayTag UCursoryGlobals::GetMountedCustomCursor() const
 {
-	return MountedCursor;
+	return PlayerMountedCursor;
 }
 
-void UCursoryGlobals::MountCustomCursor(FGameplayTag& Identifier)
+void UCursoryGlobals::MountCustomCursor(FGameplayTag& Identifier, bool bWidget /* = false */)
 {
 	if (auto Cursor = LoadedCursors.Find(Identifier))
 	{
-		MountedCursor = Identifier;
+		if (bWidget)
+		{
+			bCursorOverridenByWidget = true;
+			WidgetMountedCursor = Identifier;
+		}
+
+		else
+		{
+			PlayerMountedCursor = Identifier;
+		}
+
 		FSlateApplication::Get().GetPlatformCursor()->SetTypeShape(EMouseCursor::Custom, *Cursor);
 	}
 
@@ -237,6 +280,17 @@ void UCursoryGlobals::MountCustomCursor(FGameplayTag& Identifier)
 	{
 		UE_LOG(LogCursory, Warning, TEXT("Tried to mount custom cursor [%s], but no such cursor has been loaded."), *Identifier.ToString());
 	}
+}
+
+void UCursoryGlobals::RevertCustomCursorToPlayer()
+{
+	bCursorOverridenByWidget = false;
+	MountCustomCursor(PlayerMountedCursor);
+}
+
+void UCursoryGlobals::SetAutoFocusViewport(bool bActive)
+{
+	bAutoFocusViewport = bActive;
 }
 
 #undef LOCTEXT_NAMESPACE

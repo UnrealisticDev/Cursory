@@ -104,6 +104,17 @@ private:
 	 */
 	void LoadCursors();
 
+	/** Monitor viewport status. */
+	void MonitorViewportStatus();
+
+	/** 
+	 * Check viewport status (i.e. whether it is hovered, focused, etc.)
+	 * to determine if we need to give focus to viewport or revert cursor
+	 * to the one tied to the player.
+	 * This is necessary to handle widgets properly.
+	 */
+	void AuditViewportStatus(float DeltaSeconds);
+
 	/************************************************************************
 	*
 	*	:Manipulation
@@ -125,7 +136,20 @@ public:
 	 * Mounts the specified cursor for the platform's MouseCursor::Custom. 
 	 * Player must set their CurrentMouseCursor to Custom to see the effect. 
 	 */
-	void MountCustomCursor(FGameplayTag& Identifier);
+	void MountCustomCursor(FGameplayTag& Identifier, bool bWidget = false);
+
+private:
+
+	/** 
+	 * Reverts custom cursor to player 
+	 * (i.e. after a widget(s) previously overrode custom cursor). 
+	 */
+	void RevertCustomCursorToPlayer();
+
+public:
+
+	/** Set auto focus viewport. */
+	void SetAutoFocusViewport(bool bActive);
 
 private:
 
@@ -136,7 +160,29 @@ private:
 	/** Loaded custom cursors. */
 	TMap<FGameplayTag, void*> LoadedCursors;
 
-	/** Mounted custom cursor identifier. */
+	/** Mounted custom cursor identifier for player. */
 	UPROPERTY()
-	FGameplayTag MountedCursor;
+	FGameplayTag PlayerMountedCursor;
+
+	/** Mounted custom cursor identifier for widgets. */
+	UPROPERTY()
+	FGameplayTag WidgetMountedCursor;
+
+	/** 
+	 * Flag set when custom cursor overriden by Widget.
+	 * Used to revert automatically to player desired cursor
+	 * when back over the viewport.
+	 */
+	UPROPERTY()
+	bool bCursorOverridenByWidget;
+
+	/** 
+	 * If true, automatically focuses viewport when directly hovered. 
+	 * Prevents reversion to default cursor when viewport loses focus (e.g. on button press).
+	 * If false, users will need to manually restore focus to viewport
+	 * once lost.
+	 * Can be toggled at runtime.
+	 */
+	UPROPERTY(EditAnywhere, config, Category = "Focus")
+	bool bAutoFocusViewport;
 };

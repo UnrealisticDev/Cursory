@@ -7,6 +7,11 @@
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "CursoryGlobals.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Widgets/SViewport.h"
+#include "Engine/World.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Components/Widget.h"
 
 void UCursoryFunctionLibrary::UseStandardCursor(const UObject* WorldContextObject, EMouseCursor::Type Cursor)
 {
@@ -37,4 +42,46 @@ void UCursoryFunctionLibrary::UseCustomCursor(const UObject* WorldContextObject,
 
 	ICursoryModule::Get().GetGlobals()->MountCustomCursor(Identifier);
 	PlayerOne->CurrentMouseCursor = EMouseCursor::Custom;
+}
+
+void UCursoryFunctionLibrary::UseWidgetStandardCursor(UWidget* Widget, EMouseCursor::Type Cursor)
+{
+	if (Widget)
+	{
+		Widget->SetCursor(Cursor);
+	}
+}
+
+void UCursoryFunctionLibrary::UseWidgetCustomCursor(UWidget* Widget, FGameplayTag Identifier)
+{
+	if (Widget)
+	{
+		ICursoryModule::Get().GetGlobals()->MountCustomCursor(Identifier, true);
+		Widget->SetCursor(EMouseCursor::Custom);
+	}
+}
+
+void UCursoryFunctionLibrary::UsePlayerCursorForWidget(UWidget* Widget)
+{
+	if (Widget)
+	{
+		APlayerController* PlayerOne = UGameplayStatics::GetPlayerController(Widget, 0);
+		if (!PlayerOne)
+		{
+			UE_LOG(LogCursory, Warning, TEXT("Could not find player to use cursor on."));
+			return;
+		}
+
+		Widget->SetCursor(PlayerOne->GetMouseCursor());
+	}
+}
+
+void UCursoryFunctionLibrary::PauseAutoFocusViewport()
+{
+	ICursoryModule::Get().GetGlobals()->SetAutoFocusViewport(true);
+}
+
+void UCursoryFunctionLibrary::ResumeAutoFocusViewport()
+{
+	ICursoryModule::Get().GetGlobals()->SetAutoFocusViewport(false);
 }

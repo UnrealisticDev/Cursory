@@ -22,7 +22,8 @@ public class Cursory : ModuleRules
 			"SlateCore", 
 			"GameplayTags",
 			"ImageWrapper",
-			"ApplicationCore"
+			"ApplicationCore",
+			"UMG"
 		});
 
 		if (Target.Type == TargetType.Editor)
