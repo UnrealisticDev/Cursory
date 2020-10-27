@@ -5,12 +5,14 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "GameplayTagContainer.h"
 #include "GenericPlatform/ICursor.h"
+#include "CursoryTypes.h"
 #include "CursoryFunctionLibrary.generated.h"
 
 class UWidget;
+class UUserWidget;
 
 /**********************************************************************************
-*	UCursoryFunctionLibrary
+*	`UCursoryFunctionLibrary
 *	-------------
 *	Function library for easy access to Cursory functionality.
 *	Preferred entry point for end users.
@@ -22,42 +24,77 @@ class UCursoryFunctionLibrary : public UBlueprintFunctionLibrary
 
 public:
 
-	/** 
-	 * Sets the hardware cursor for player one.
-	 * Do not use this to set the cursor to Custom. 
-	 * Note: Does not affect widget cursors.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Cursory", meta = (WorldContext = "WorldContextObject"))
+	UFUNCTION(BlueprintCallable, Category = "Cursory", meta = (WorldContext = "WorldContextObject", DeprecatedFunction, DeprecationMessage="Use UseBaseStandardCursor() instead."))
 	static void UseStandardCursor(const UObject* WorldContextObject, EMouseCursor::Type Cursor);
 
-	/** 
-	 * Set the hardware cursor for player one. 
-	 * Note: Does not affect widget cursors.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Cursory", meta = (WorldContext = "WorldContextObject"))
+	UFUNCTION(BlueprintCallable, Category = "Cursory", meta = (WorldContext = "WorldContextObject", DeprecatedFunction, DeprecationMessage = "Use UseBaseCustomCursor() instead."))
 	static void UseCustomCursor(const UObject* WorldContextObject, FGameplayTag Identifier);
 
-	/** 
-	 * Set the hardware cursor for the specified widget.
-	 * Do not use this to set the cursor to Custom.
-	 * Note: Does not affect player cursor.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Cursory", meta=(DefaultToSelf=Widget))
-	static void UseWidgetStandardCursor(UWidget* Widget, EMouseCursor::Type Cursor);
+	/************************************************************************
+	* ```Base Cursor */
 
-	/**
-	 * Set the hardware cursor for the specified widget.
-	 * Note: Does not affect player cursor.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Cursory", meta=(DefaultToSelf=Widget))
-	static void UseWidgetCustomCursor(UWidget* Widget, FGameplayTag Identifier);
+	/** Set the base cursor to a standard type. */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static void UseBaseStandardCursor(EMouseCursor::Type Cursor);
+
+	/** Set the base cursor to a custom type. */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static void UseBaseCustomCursor(FGameplayTag Identifier);
+
+	/************************************************************************
+	* ```Cursor Stack */
+
+	/** Push a (standard) cursor onto the stack. */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static FCursorStackElementHandle PushStandardCursor(EMouseCursor::Type Cursor);
+
+	/** Push a (custom) cursor onto the stack. */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static FCursorStackElementHandle PushCustomCursor(FGameplayTag Identifier);
 
 	/** 
-	 * Set the hardware cursor for the specified widget to 
-	 * the player cursor. 
+	 * Update a cursor on the stack to standard, by handle.
+	 * Does nothing if cursor associated with handle is not on stack.
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Cursory", meta=(DefaultToSelf=Widget, WorldContext = "Widget"))
-	static void UsePlayerCursorForWidget(UWidget* Widget);
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static void SetStandardCursorByHandle(FCursorStackElementHandle Handle, EMouseCursor::Type Cursor);
+
+	/** 
+	 * Update a cursor on the stack to custom, by handle. 
+	 * Does nothing if cursor associated with handle is not on stack.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static void SetCustomCursorByHandle(FCursorStackElementHandle Handle, FGameplayTag Identifier);
+
+	/** Remove a cursor from the stack, by handle. */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static void RemoveCursorByHandle(FCursorStackElementHandle Handle);
+
+	/** Pop a cursor from the stack. */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static void PopCursor();
+
+	/************************************************************************
+	* ```Widget */
+
+	/** Conforms the specified widget to use the global Cursory cursor. */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static void ConformWidgetToCursory(UWidget* Widget);
+
+	/** Conforms the specified widgets to use the global Cursory cursor. */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static void ConformWidgetsToCursory(TArray<UWidget*> Widgets);
+
+	/** 
+	 * Conforms the specified widget and all children 
+	 * (and optionally descendant UserWidgets) 
+	 * to use the global Cursory cursor. 
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Cursory", meta=(AdvancedDisplay=1, DisplayName="Conform Widget to Cursory (Recursive)"))
+	static void ConformWidgetToCursoryRecursive(UUserWidget* Widget, bool bDescendantUserWidgets = false);
+
+	/************************************************************************
+	* ```Advanced */
 
 	/** Pause automatically focusing viewport when directly hovered. */
 	UFUNCTION(BlueprintCallable, Category = "Cursory")

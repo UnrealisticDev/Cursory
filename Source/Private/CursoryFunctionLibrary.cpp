@@ -12,67 +12,141 @@
 #include "Engine/World.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Widget.h"
+#include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetTree.h"
 
 void UCursoryFunctionLibrary::UseStandardCursor(const UObject* WorldContextObject, EMouseCursor::Type Cursor)
 {
-	if (Cursor == EMouseCursor::Custom)
-	{
-		UE_LOG(LogCursory, Warning, TEXT("Used UseStandardCursor() to use custom cursor. Use UseCustomCursor() instead."));
-		return;
-	}
-
-	APlayerController* PlayerOne = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
-	if (!PlayerOne)
-	{
-		UE_LOG(LogCursory, Warning, TEXT("Could not find player to use cursor on."));
-		return;
-	}
-
-	PlayerOne->CurrentMouseCursor = Cursor;
+	// Stub
 }
 
 void UCursoryFunctionLibrary::UseCustomCursor(const UObject* WorldContextObject, FGameplayTag Identifier)
 {
-	APlayerController* PlayerOne = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
-	if (!PlayerOne)
+	// Stub
+}
+
+void UCursoryFunctionLibrary::UseBaseStandardCursor(EMouseCursor::Type Cursor)
+{
+	if (Cursor == EMouseCursor::Custom)
 	{
-		UE_LOG(LogCursory, Warning, TEXT("Could not find player to use cursor on."));
+		UE_LOG(LogCursory, Warning, TEXT("Used UseBaseStandardCursor() to set custom cursor. Use UseBaseCustomCursor() instead."));
 		return;
 	}
 
-	ICursoryModule::Get().GetGlobals()->MountCustomCursor(Identifier);
-	PlayerOne->CurrentMouseCursor = EMouseCursor::Custom;
-}
-
-void UCursoryFunctionLibrary::UseWidgetStandardCursor(UWidget* Widget, EMouseCursor::Type Cursor)
-{
-	if (Widget)
+	FCursorStackElement NewBaseCursor;
 	{
-		Widget->SetCursor(Cursor);
+		NewBaseCursor.CursorType = Cursor;
 	}
+
+	ICursoryModule::Get().GetGlobals()->ModifyBaseCursor(NewBaseCursor);
 }
 
-void UCursoryFunctionLibrary::UseWidgetCustomCursor(UWidget* Widget, FGameplayTag Identifier)
+void UCursoryFunctionLibrary::UseBaseCustomCursor(FGameplayTag Identifier)
 {
-	if (Widget)
+	FCursorStackElement NewBaseCursor;
 	{
-		ICursoryModule::Get().GetGlobals()->MountCustomCursor(Identifier, true);
-		Widget->SetCursor(EMouseCursor::Custom);
+		NewBaseCursor.CursorType = EMouseCursor::Custom;
+		NewBaseCursor.CustomCursorIdentifier = Identifier;
 	}
+
+	ICursoryModule::Get().GetGlobals()->ModifyBaseCursor(NewBaseCursor);
 }
 
-void UCursoryFunctionLibrary::UsePlayerCursorForWidget(UWidget* Widget)
+FCursorStackElementHandle UCursoryFunctionLibrary::PushStandardCursor(EMouseCursor::Type Cursor)
+{
+	FCursorStackElement NewCursor(FCursorStackElementHandle::Generate());
+	{
+		NewCursor.CursorType = Cursor;
+	}
+
+	return ICursoryModule::Get().GetGlobals()->PushCursor(NewCursor);
+}
+
+FCursorStackElementHandle UCursoryFunctionLibrary::PushCustomCursor(FGameplayTag Identifier)
+{
+	FCursorStackElement NewCursor(FCursorStackElementHandle::Generate());
+	{
+		NewCursor.CursorType = EMouseCursor::Custom;
+		NewCursor.CustomCursorIdentifier = Identifier;
+	}
+
+	return ICursoryModule::Get().GetGlobals()->PushCursor(NewCursor);
+}
+
+void UCursoryFunctionLibrary::SetStandardCursorByHandle(FCursorStackElementHandle Handle, EMouseCursor::Type Cursor)
+{
+	FCursorStackElement NewCursor;
+	{
+		NewCursor.CursorType = Cursor;
+	}
+
+	ICursoryModule::Get().GetGlobals()->ModifyCursorByHandle(Handle, NewCursor);
+}
+
+void UCursoryFunctionLibrary::SetCustomCursorByHandle(FCursorStackElementHandle Handle, FGameplayTag Identifier)
+{
+	FCursorStackElement NewCursor;
+	{
+		NewCursor.CursorType = EMouseCursor::Custom;
+		NewCursor.CustomCursorIdentifier = Identifier;
+	}
+
+	ICursoryModule::Get().GetGlobals()->ModifyCursorByHandle(Handle, NewCursor);
+}
+
+void UCursoryFunctionLibrary::RemoveCursorByHandle(FCursorStackElementHandle Handle)
+{
+	ICursoryModule::Get().GetGlobals()->RemoveCursorByHandle(Handle);
+}
+
+void UCursoryFunctionLibrary::PopCursor()
+{
+	ICursoryModule::Get().GetGlobals()->PopCursor();
+}
+
+void UCursoryFunctionLibrary::ConformWidgetToCursory(UWidget* Widget)
 {
 	if (Widget)
 	{
-		APlayerController* PlayerOne = UGameplayStatics::GetPlayerController(Widget, 0);
-		if (!PlayerOne)
+		TSharedPtr<SWidget> UnderlyingWidget = Widget->GetCachedWidget();
+		if (UnderlyingWidget.IsValid())
 		{
-			UE_LOG(LogCursory, Warning, TEXT("Could not find player to use cursor on."));
-			return;
+			TAttribute<TOptional<EMouseCursor::Type>> Callback;
+			Callback.BindUObject(ICursoryModule::Get().GetGlobals(), &UCursoryGlobals::GetCurrentCursorType);
+			UnderlyingWidget->SetCursor(Callback);
+		}
+	}
+}
+
+void UCursoryFunctionLibrary::ConformWidgetsToCursory(TArray<UWidget*> Widgets)
+{
+	for (UWidget* Widget : Widgets)
+	{
+		ConformWidgetToCursory(Widget);
+	}
+}
+
+void UCursoryFunctionLibrary::ConformWidgetToCursoryRecursive(UUserWidget* Widget, bool bDescendantUserWidgets /* = false */)
+{
+	if (Widget)
+	{
+		UWidgetTree* WidgetTree = Widget->WidgetTree;
+		
+		if (bDescendantUserWidgets)
+		{
+			WidgetTree->ForEachWidgetAndDescendants([](UWidget* InWidget)
+			{
+				ConformWidgetToCursory(InWidget);
+			});
 		}
 
-		Widget->SetCursor(PlayerOne->GetMouseCursor());
+		else
+		{
+			WidgetTree->ForEachWidget([](UWidget* InWidget)
+			{
+				ConformWidgetToCursory(InWidget);
+			});
+		}
 	}
 }
 

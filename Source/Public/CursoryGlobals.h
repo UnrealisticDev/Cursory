@@ -4,10 +4,14 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DeveloperSettings.h"
+#include "CursoryTypes.h"
 #include "CursoryGlobals.generated.h"
 
+class APlayerController;
+class AGameModeBase;
+
 /**********************************************************************************
-*	FCursorInfo
+*	`FCursorInfo
 *	-------------
 *	Information describing a custom hardware cursor.
 ***********************************************************************************/
@@ -62,7 +66,7 @@ struct TStructOpsTypeTraits<FCursorInfo> : public TStructOpsTypeTraitsBase2<FCur
 };
 
 /**********************************************************************************
-*	UCursoryGlobals
+*	`UCursoryGlobals
 *	-------------
 *	Main interface for manipulating hardware cursors.
 *	Loads cursors on Engine init and allows user to
@@ -83,15 +87,42 @@ public:
 
 	/************************************************************************
 	*
-	*	:Initialization
+	*	``Initialization
 	*
 	************************************************************************/
 
 	/** 
 	 * Initializes the globals object,
-	 * listening for Engine init to start loading cursors. 
+	 * listening for Engine events to start loading cursors. 
 	 */
 	void Init();
+
+	/************************************************************************
+	*
+	*	``Cursor Type
+	*
+	************************************************************************/
+	
+public:
+
+	/** Get the current cursor type. */
+	TOptional<EMouseCursor::Type> GetCurrentCursorType() const;
+
+	DECLARE_EVENT_TwoParams(UCursoryGlobals, FCursorChanged, EMouseCursor::Type /* Cursor */, EMouseCursor::Type /* OldCursor */);
+
+	/** Delegate for when cursor type changes. */
+	FCursorChanged CursorTypeChanged;
+
+	/************************************************************************
+	*
+	*	``Custom Cursor
+	*
+	************************************************************************/
+
+public:
+
+	/** Get the current custom cursor identifier. */
+	FGameplayTag GetCurrentCustomCursorIdentifier() const;
 
 private:
 
@@ -102,24 +133,7 @@ private:
 	 * - Mac: .tiff -> .png 
 	 * - Linux: .png 
 	 */
-	void LoadCursors();
-
-	/** Monitor viewport status. */
-	void MonitorViewportStatus();
-
-	/** 
-	 * Check viewport status (i.e. whether it is hovered, focused, etc.)
-	 * to determine if we need to give focus to viewport or revert cursor
-	 * to the one tied to the player.
-	 * This is necessary to handle widgets properly.
-	 */
-	void AuditViewportStatus(float DeltaSeconds);
-
-	/************************************************************************
-	*
-	*	:Manipulation
-	*
-	************************************************************************/
+	void LoadCustomCursors();
 
 public:
 
@@ -129,22 +143,78 @@ public:
 	/** Gets the full list of cursor options. */
 	FGameplayTagContainer GetCustomCursorOptions() const;
 
-	/** Returns the identifier for the currently mounted custom cursor. */
-	FGameplayTag GetMountedCustomCursor() const;
-
 	/** 
 	 * Mounts the specified cursor for the platform's MouseCursor::Custom. 
-	 * Player must set their CurrentMouseCursor to Custom to see the effect. 
+	 * Cursor must be set to Custom to see the effect. 
 	 */
 	void MountCustomCursor(FGameplayTag& Identifier, bool bWidget = false);
 
 private:
 
-	/** 
-	 * Reverts custom cursor to player 
-	 * (i.e. after a widget(s) previously overrode custom cursor). 
-	 */
-	void RevertCustomCursorToPlayer();
+	/** Custom cursor specs. Will be loaded on Engine startup. */
+	UPROPERTY(EditAnywhere, config, Category = "Cursors")
+	TSet<FCursorInfo> CustomCursorSpecs;
+
+	/** Loaded custom cursors. */
+	TMap<FGameplayTag, void*> LoadedCustomCursors;
+
+public:
+
+	/************************************************************************
+	*
+	*	``Cursor Stack
+	*
+	************************************************************************/
+
+private:
+
+	/** Pushes the base cursor onto the stack. */
+	void PushBaseCursor();
+
+public:
+
+	/** Set base cursor. */
+	void ModifyBaseCursor(const FCursorStackElement& Cursor, bool bIgnoreType = false, bool bIgnoreCustom = false);
+
+	/** Push a cursor onto the stack. */
+	FCursorStackElementHandle PushCursor(FCursorStackElement Cursor);
+
+	/** Modify a cursor on the stack by handle. */
+	void ModifyCursorByHandle(FCursorStackElementHandle Handle, FCursorStackElement NewCursor);
+
+	/** Remove a cursor from the stack by handle. */
+	void RemoveCursorByHandle(FCursorStackElementHandle Handle);
+
+	/** Pop a cursor from the stack. */
+	void PopCursor();
+
+private:
+
+	/** Evaluates cursor stack. */
+	void EvaluateCursorStack();
+
+	/** Reset cursor stack. */
+	void ResetCursorStack();
+
+private:
+
+	/** Cursor stack - topmost element dictates current cursor. */
+	UPROPERTY()
+	TArray<FCursorStackElement> CursorStack;
+
+	/** Cached cursor type. */
+	UPROPERTY()
+	TEnumAsByte<EMouseCursor::Type> CachedCursorType;
+
+	/** Cached custom cursor identifier. */
+	UPROPERTY()
+	FGameplayTag CachedCustomCursorIdentifier;
+
+	/************************************************************************
+	*
+	*	``Viewport Focus
+	*
+	************************************************************************/
 
 public:
 
@@ -153,31 +223,21 @@ public:
 
 private:
 
-	/** Custom cursor specs. Will be loaded on Engine startup. */
-	UPROPERTY(EditAnywhere, config, Category = "Cursors")
-	TSet<FCursorInfo> CursorSpecs;
+	/** Monitor viewport status. */
+	void MonitorViewportStatus();
 
-	/** Loaded custom cursors. */
-	TMap<FGameplayTag, void*> LoadedCursors;
-
-	/** Mounted custom cursor identifier for player. */
-	UPROPERTY()
-	FGameplayTag PlayerMountedCursor;
-
-	/** Mounted custom cursor identifier for widgets. */
-	UPROPERTY()
-	FGameplayTag WidgetMountedCursor;
-
-	/** 
-	 * Flag set when custom cursor overriden by Widget.
-	 * Used to revert automatically to player desired cursor
-	 * when back over the viewport.
+	/**
+	 * Check viewport status (i.e. whether it is hovered, focused, etc.)
+	 * to determine if we need to give focus to viewport or revert cursor
+	 * to the one tied to the player.
+	 * This is necessary to handle widgets properly.
 	 */
-	UPROPERTY()
-	bool bCursorOverridenByWidget;
+	void AuditViewportStatus(float DeltaSeconds);
 
-	/** 
-	 * If true, automatically focuses viewport when directly hovered. 
+private:
+
+	/**
+	 * If true, automatically focuses viewport when directly hovered.
 	 * Prevents reversion to default cursor when viewport loses focus (e.g. on button press).
 	 * If false, users will need to manually restore focus to viewport
 	 * once lost.
