@@ -25,6 +25,11 @@ void UCursoryFunctionLibrary::UseCustomCursor(const UObject* WorldContextObject,
 	// Stub
 }
 
+void UCursoryFunctionLibrary::ResetBaseCursor()
+{
+	UseBaseStandardCursor(EMouseCursor::Default);
+}
+
 void UCursoryFunctionLibrary::UseBaseStandardCursor(EMouseCursor::Type Cursor)
 {
 	if (Cursor == EMouseCursor::Custom)
@@ -102,6 +107,16 @@ void UCursoryFunctionLibrary::RemoveCursorByHandle(FCursorStackElementHandle Han
 void UCursoryFunctionLibrary::PopCursor()
 {
 	ICursoryModule::Get().GetGlobals()->PopCursor();
+}
+
+void UCursoryFunctionLibrary::ConformSWidgetToCursory(SWidget* Widget)
+{
+	if (Widget)
+	{
+		TAttribute<TOptional<EMouseCursor::Type>> Callback;
+		Callback.BindUObject(ICursoryModule::Get().GetGlobals(), &UCursoryGlobals::GetCurrentCursorType);
+		Widget->SetCursor(Callback);
+	}
 }
 
 void UCursoryFunctionLibrary::ConformWidgetToCursory(UWidget* Widget)

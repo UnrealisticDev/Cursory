@@ -10,6 +10,7 @@
 
 class UWidget;
 class UUserWidget;
+class SWidget;
 
 /**********************************************************************************
 *	`UCursoryFunctionLibrary
@@ -32,6 +33,10 @@ public:
 
 	/************************************************************************
 	* ```Base Cursor */
+
+	/** Reset the base cursor to default. */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static void ResetBaseCursor();
 
 	/** Set the base cursor to a standard type. */
 	UFUNCTION(BlueprintCallable, Category = "Cursory")
@@ -70,12 +75,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Cursory")
 	static void RemoveCursorByHandle(FCursorStackElementHandle Handle);
 
-	/** Pop a cursor from the stack. */
+	/** 
+	 * Pop a cursor from the stack.
+	 * Does nothing if only the base cursor is on the stack.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Cursory")
 	static void PopCursor();
 
 	/************************************************************************
 	* ```Widget */
+
+	/** Conforms the specified SWidget to use the global Cursory cursor. */
+	static void ConformSWidgetToCursory(SWidget* Widget);
 
 	/** Conforms the specified widget to use the global Cursory cursor. */
 	UFUNCTION(BlueprintCallable, Category = "Cursory")
