@@ -186,7 +186,7 @@ struct FPNGConverter
 
 TOptional<EMouseCursor::Type> UCursoryGlobals::GetCurrentCursorType() const
 {
-	return CachedCursorType;
+	return CachedCursorType.GetValue();
 }
 
 FGameplayTag UCursoryGlobals::GetCurrentCustomCursorIdentifier() const
