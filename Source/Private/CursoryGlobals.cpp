@@ -43,7 +43,7 @@ void UCursoryGlobals::Init()
 		if (FSlateApplication::IsInitialized())
 		{
 			LoadCustomCursors();
-			ResetCursorStack();
+			ClearCursorStack();
 			MonitorViewportStatus();
 		}
 	});
@@ -59,7 +59,7 @@ void UCursoryGlobals::Init()
 	// If in Editor, reset base cursor every time PIE ends.
 	FEditorDelegates::EndPIE.AddWeakLambda(this, [this](const bool bIsSimulating)
 	{
-		ResetCursorStack();
+		ClearCursorStack();
 	});
 
 #endif
@@ -326,6 +326,15 @@ void UCursoryGlobals::PopCursor()
 	}
 }
 
+void UCursoryGlobals::ResetCursorStack()
+{
+	while (CursorStack.Num() > 1)
+	{
+		CursorStack.Pop();
+	}
+	EvaluateCursorStack();
+}
+
 void UCursoryGlobals::EvaluateCursorStack()
 {
 	FCursorStackElement& TopCursor = CursorStack.Last(0);
@@ -347,7 +356,7 @@ void UCursoryGlobals::EvaluateCursorStack()
 	}
 }
 
-void UCursoryGlobals::ResetCursorStack()
+void UCursoryGlobals::ClearCursorStack()
 {
 	CursorStack.Empty();
 	PushBaseCursor();

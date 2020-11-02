@@ -188,13 +188,16 @@ public:
 	/** Pop a cursor from the stack. */
 	void PopCursor();
 
+	/** Reset cursor stack (clear all stack elements except base). */
+	void ResetCursorStack();
+
 private:
 
 	/** Evaluates cursor stack. */
 	void EvaluateCursorStack();
 
-	/** Reset cursor stack. */
-	void ResetCursorStack();
+	/** Clear cursor stack (all elements). */
+	void ClearCursorStack();
 
 private:
 

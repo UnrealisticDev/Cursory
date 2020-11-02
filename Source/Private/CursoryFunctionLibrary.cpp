@@ -109,6 +109,11 @@ void UCursoryFunctionLibrary::PopCursor()
 	ICursoryModule::Get().GetGlobals()->PopCursor();
 }
 
+void UCursoryFunctionLibrary::ResetCursorStack()
+{
+	ICursoryModule::Get().GetGlobals()->ResetCursorStack();
+}
+
 void UCursoryFunctionLibrary::ConformSWidgetToCursory(SWidget* Widget)
 {
 	if (Widget)

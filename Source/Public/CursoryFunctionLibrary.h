@@ -82,6 +82,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Cursory")
 	static void PopCursor();
 
+	/** Reset cursor stack (clear all stack elements except base). */
+	UFUNCTION(BlueprintCallable, Category = "Cursory")
+	static void ResetCursorStack();
+
 	/************************************************************************
 	* ```Widget */
 
