@@ -18,6 +18,7 @@ public class Cursory : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] 
 		{ 
+			"DeveloperSettings",
 			"Slate", 
 			"SlateCore", 
 			"GameplayTags",
