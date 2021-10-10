@@ -21,8 +21,7 @@ public:
 	/** Returns a reference to the Cursory module singleton. */
 	static ICursoryModule& Get()
 	{
-		static ICursoryModule& singleton = FModuleManager::LoadModuleChecked<ICursoryModule>("Cursory");
-		return singleton;
+		return FModuleManager::LoadModuleChecked<ICursoryModule>("Cursory");
 	}
 
 	/** Returns a pointer to the module globals object. */
