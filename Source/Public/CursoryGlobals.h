@@ -11,11 +11,6 @@
 class APlayerController;
 class AGameModeBase;
 
-/**********************************************************************************
-*	`FCursorInfo
-*	-------------
-*	Information describing a custom hardware cursor.
-***********************************************************************************/
 USTRUCT(BlueprintType)
 struct FCursorInfo 
 {
@@ -66,17 +61,15 @@ struct TStructOpsTypeTraits<FCursorInfo> : public TStructOpsTypeTraitsBase2<FCur
 	};
 };
 
-/**********************************************************************************
-*	`UCursoryGlobals
-*	-------------
-*	Main interface for manipulating hardware cursors.
-*	Loads cursors on Engine init and allows user to
-*	use cursors at runtime. Loaded cursors are handled by the underlying platform, 
-*	and do not need to be unloaded or deleted manually.
-*	
-*	Note: The "config=..." value specifies the Project Settings category.
-*	The "DisplayName=..." value specifies the Project Settings section name.
-***********************************************************************************/
+/**
+ * Main interface for manipulating hardware cursors.
+ * Loads cursors on Engine init and allows user to
+ * use cursors at runtime. Loaded cursors are handled by the underlying platform, 
+ * and do not need to be unloaded or deleted manually.
+ * 
+ * Note: The "config=..." value specifies the Project Settings category.
+ * The "DisplayName=..." value specifies the Project Settings section name.
+ */
 UCLASS(config=Game, defaultconfig, meta=(DisplayName="Cursors", ToolTip="Custom hardware cursors for your game."))
 class CURSORY_API UCursoryGlobals : public UDeveloperSettings
 {
@@ -86,23 +79,11 @@ public:
 
 	UCursoryGlobals(const FObjectInitializer& ObjectInitializer);
 
-	/************************************************************************
-	*
-	*	``Initialization
-	*
-	************************************************************************/
-
 	/** 
 	 * Initializes the globals object,
 	 * listening for Engine events to start loading cursors. 
 	 */
 	void Init();
-
-	/************************************************************************
-	*
-	*	``Cursor Type
-	*
-	************************************************************************/
 	
 public:
 
@@ -113,12 +94,6 @@ public:
 
 	/** Delegate for when cursor type changes. */
 	FCursorChanged CursorTypeChanged;
-
-	/************************************************************************
-	*
-	*	``Custom Cursor
-	*
-	************************************************************************/
 
 public:
 
@@ -160,12 +135,6 @@ private:
 	TMap<FGameplayTag, void*> LoadedCustomCursors;
 
 public:
-
-	/************************************************************************
-	*
-	*	``Cursor Stack
-	*
-	************************************************************************/
 
 private:
 
@@ -213,12 +182,6 @@ private:
 	/** Cached custom cursor identifier. */
 	UPROPERTY()
 	FGameplayTag CachedCustomCursorIdentifier;
-
-	/************************************************************************
-	*
-	*	``Viewport Focus
-	*
-	************************************************************************/
 
 public:
 

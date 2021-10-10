@@ -13,12 +13,10 @@ class UWidget;
 class UUserWidget;
 class SWidget;
 
-/**********************************************************************************
-*	`UCursoryFunctionLibrary
-*	-------------
-*	Function library for easy access to Cursory functionality.
-*	Preferred entry point for end users.
-***********************************************************************************/
+/**
+ * Function library for easy access to Cursory functionality.
+ * Preferred entry point for end users.
+ */
 UCLASS()
 class UCursoryFunctionLibrary : public UBlueprintFunctionLibrary
 {
@@ -32,9 +30,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Cursory", meta = (WorldContext = "WorldContextObject", DeprecatedFunction, DeprecationMessage = "Use UseBaseCustomCursor() instead."))
 	static void UseCustomCursor(const UObject* WorldContextObject, FGameplayTag Identifier);
 
-	/************************************************************************
-	* ```Base Cursor */
-
 	/** Reset the base cursor to default. */
 	UFUNCTION(BlueprintCallable, Category = "Cursory")
 	static void ResetBaseCursor();
@@ -46,9 +41,6 @@ public:
 	/** Set the base cursor to a custom type. */
 	UFUNCTION(BlueprintCallable, Category = "Cursory")
 	static void UseBaseCustomCursor(FGameplayTag Identifier);
-
-	/************************************************************************
-	* ```Cursor Stack */
 
 	/** Push a (standard) cursor onto the stack. */
 	UFUNCTION(BlueprintCallable, Category = "Cursory")
@@ -87,9 +79,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Cursory")
 	static void ResetCursorStack();
 
-	/************************************************************************
-	* ```Widget */
-
 	/** Conforms the specified SWidget to use the global Cursory cursor. */
 	static void ConformSWidgetToCursory(SWidget* Widget);
 
@@ -108,9 +97,6 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Cursory", meta=(AdvancedDisplay=1, DisplayName="Conform Widget to Cursory (Recursive)"))
 	static void ConformWidgetToCursoryRecursive(UUserWidget* Widget, bool bDescendantUserWidgets = false);
-
-	/************************************************************************
-	* ```Advanced */
 
 	/** Pause automatically focusing viewport when directly hovered. */
 	UFUNCTION(BlueprintCallable, Category = "Cursory")

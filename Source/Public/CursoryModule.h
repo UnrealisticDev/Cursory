@@ -10,12 +10,10 @@ class UCursoryGlobals;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCursory, Log, All);
 
-/**********************************************************************************
-*	`ICursoryModule
-*	-------------
-*	Public interface for Cursor module.
-*	Provides advanced hardware cursor capabilities.
-***********************************************************************************/
+/**
+ * Public interface for Cursory module.
+ * Provides advanced hardware cursor capabilities.
+ */
 class ICursoryModule : public FDefaultGameModuleImpl
 {
 public:

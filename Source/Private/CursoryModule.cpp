@@ -7,11 +7,6 @@ DEFINE_LOG_CATEGORY(LogCursory);
 
 #define LOCTEXT_NAMESPACE "CursoryModule"
 
-/**********************************************************************************
-*	FCursoryModule
-*	-------------
-*	The private implementation of the Cursory module.
-***********************************************************************************/
 class FCursoryModule : public ICursoryModule
 {
 	void StartupModule() override;

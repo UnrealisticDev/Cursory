@@ -7,11 +7,6 @@
 #include "GameplayTagContainer.h"
 #include "CursoryTypes.generated.h"
 
-/**********************************************************************************
-*	`FCursorStackElementHandle
-*	-------------
-*	Handle for a cursor stack element.
-***********************************************************************************/
 USTRUCT(BlueprintType)
 struct FCursorStackElementHandle
 {
@@ -46,11 +41,6 @@ private:
 	int32 Id;
 };
 
-/**********************************************************************************
-*	`FCursorStackElement
-*	-------------
-*	An element in a cursor stack.
-***********************************************************************************/
 USTRUCT()
 struct FCursorStackElement
 {
