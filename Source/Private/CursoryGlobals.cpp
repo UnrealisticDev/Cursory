@@ -5,6 +5,7 @@
 #include "GenericPlatform/ICursor.h"
 #include "Misc/Paths.h"
 #include "CursoryModule.h"
+#include "CursorySettings.h"
 #include "Misc/CoreDelegates.h"
 #include "IImageWrapperModule.h"
 #include "HAL/FileManager.h"
@@ -16,19 +17,13 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
+#include "Widgets/SViewport.h"
 
 #if WITH_EDITOR
 #include "Editor.h"
 #endif
 
 #define LOCTEXT_NAMESPACE "CursoryGlobals"
-
-UCursoryGlobals::UCursoryGlobals(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
-	, bAutoFocusViewport(true)
-{
-	// Stub
-}
 
 void UCursoryGlobals::Init()
 {
@@ -200,12 +195,13 @@ void UCursoryGlobals::LoadCustomCursors()
 	LoadedCustomCursors.Reset();
 
 	TSharedPtr<ICursor> PlatformCursor = FSlateApplication::Get().GetPlatformCursor();
+	const TSet<FCursorInfo> CustomCursorSpecs = GetDefault<UCursorySettings>()->CustomCursorSpecs;
 
 	// Iterate through specs and load cursor handles.
-	for (FCursorInfo& CursorSpec : CustomCursorSpecs)
+	for (const FCursorInfo& CursorSpec : CustomCursorSpecs)
 	{
 		// Validate hot spot.
-		FVector2D& Hotspot = CursorSpec.Hotspot;
+		FVector2D Hotspot = CursorSpec.Hotspot;
 		ensure(Hotspot.X >= 0.0f && Hotspot.X <= 1.0f);
 		ensure(Hotspot.Y >= 0.0f && Hotspot.Y <= 1.0f);
 		Hotspot.X = FMath::Clamp(Hotspot.X, 0.0f, 1.0f);
@@ -382,7 +378,8 @@ void UCursoryGlobals::AuditViewportStatus(float DeltaSeconds)
 	{
 		// If viewport lost focus along the way, restore focus
 		// (Clicking a widget may take focus)
-		if (bAutoFocusViewport && !GameViewport->HasUserFocus(0).IsSet())
+		const bool bShouldAutoFocus = bAutoFocusViewport.Get(GetDefault<UCursorySettings>()->bAutoFocusViewport);		
+		if (bShouldAutoFocus && !GameViewport->HasUserFocus(0).IsSet())
 		{
 			UWidgetBlueprintLibrary::SetFocusToGameViewport();
 		}

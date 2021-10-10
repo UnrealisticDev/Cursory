@@ -3,63 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/Object.h"
 #include "GameplayTagContainer.h"
-#include "Engine/DeveloperSettings.h"
 #include "CursoryTypes.h"
 #include "CursoryGlobals.generated.h"
 
 class APlayerController;
 class AGameModeBase;
-
-USTRUCT(BlueprintType)
-struct FCursorInfo 
-{
-	GENERATED_BODY()
-
-public:
-
-	/** The identifying tag for this cursor. */
-	UPROPERTY(EditAnywhere, Category = Info)
-	FGameplayTag Identifier;
-
-	/** 
-	 * The path to this cursor (relative to the game's Content directory). 
-	 * For example, Slate/Cursors/coolcursor. Leave out file extensions. 
-	 */
-	UPROPERTY(EditAnywhere, Category = Info)
-	FString Path;
-
-	/** 
-	 * A coordinate representing the operative point of a cursor, relative to the top-left.
-	 * Coordinates should be normalized (between 0..1). For example, a typical crosshair would have a Hotspot of (0.5, 0.5). 
-	 * Some cursor file types (.ani, .cur) have hotspots encoded. In this case, the file hotspot will control.
-	 * This value will only be used for other image types that do not provide hotspots (.tiff, .png).
-	 */
-	UPROPERTY(EditAnywhere, Category = Info)
-	FVector2D Hotspot;
-
-	/** Allows using this struct as a TSet/TMap key. */
-	bool operator==(const FCursorInfo& Other) const
-	{
-		return Identifier == Other.Identifier;
-	}
-};
-
-/** Allows using this struct as a TSet/TMap key. */
-FORCEINLINE uint32 GetTypeHash(const FCursorInfo& InInfo)
-{
-	return GetTypeHash(InInfo.Identifier);
-}
-
-/** Allows using this struct as a TSet/TMap key in Blueprints. */
-template<>
-struct TStructOpsTypeTraits<FCursorInfo> : public TStructOpsTypeTraitsBase2<FCursorInfo>
-{
-	enum
-	{
-		WithIdenticalViaEquality = true
-	};
-};
 
 /**
  * Main interface for manipulating hardware cursors.
@@ -70,14 +20,12 @@ struct TStructOpsTypeTraits<FCursorInfo> : public TStructOpsTypeTraitsBase2<FCur
  * Note: The "config=..." value specifies the Project Settings category.
  * The "DisplayName=..." value specifies the Project Settings section name.
  */
-UCLASS(config=Game, defaultconfig, meta=(DisplayName="Cursors", ToolTip="Custom hardware cursors for your game."))
-class CURSORY_API UCursoryGlobals : public UDeveloperSettings
+UCLASS()
+class CURSORY_API UCursoryGlobals : public UObject
 {
 	GENERATED_BODY()
 
 public:
-
-	UCursoryGlobals(const FObjectInitializer& ObjectInitializer);
 
 	/** 
 	 * Initializes the globals object,
@@ -160,10 +108,6 @@ private:
 	 */
 	void AuditViewportStatus(float DeltaSeconds);
 
-	/** Custom cursor specs. Will be loaded on Engine startup. */
-	UPROPERTY(EditAnywhere, config, Category = "Cursors")
-	TSet<FCursorInfo> CustomCursorSpecs;
-
 	/** Loaded custom cursors. */
 	TMap<FGameplayTag, void*> LoadedCustomCursors;
 	
@@ -179,13 +123,5 @@ private:
 	UPROPERTY()
 	FGameplayTag CachedCustomCursorIdentifier;
 
-	/**
-	 * If true, automatically focuses viewport when directly hovered.
-	 * Prevents reversion to default cursor when viewport loses focus (e.g. on button press).
-	 * If false, users will need to manually restore focus to viewport
-	 * once lost.
-	 * Can be toggled at runtime.
-	 */
-	UPROPERTY(EditAnywhere, config, Category = "Focus")
-	bool bAutoFocusViewport;
+	TOptional<bool> bAutoFocusViewport;
 };
