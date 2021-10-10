@@ -14,12 +14,8 @@ struct FCursorStackElementHandle
 
 public:
 
-	FCursorStackElementHandle();
-
-	/** Generates a unique handle. */
 	static FCursorStackElementHandle Generate();
-
-	/** Returns true if handle is valid. */
+	
 	bool IsValid() const;
 
 	/** Allow this struct to be used as TSet/TMap key. */
@@ -36,9 +32,8 @@ public:
 
 private:
 
-	/** Unique id for this handle. */
 	UPROPERTY()
-	int32 Id;
+	int32 Id{-1};
 };
 
 USTRUCT()
@@ -48,18 +43,9 @@ struct FCursorStackElement
 
 public:
 
-	FCursorStackElement();
+	FCursorStackElement() {}
 	FCursorStackElement(FCursorStackElementHandle InHandle);
 
-	/** Cursor type. */
-	UPROPERTY()
-	TEnumAsByte<EMouseCursor::Type> CursorType;
-
-	/** Identifier for custom cursor. */
-	UPROPERTY()
-	FGameplayTag CustomCursorIdentifier;
-
-	/** Get the handle for this element. */
 	FCursorStackElementHandle GetHandle() const;
 
 	/** Allows this struct to be found in an array via equality. */
@@ -67,6 +53,12 @@ public:
 	{
 		return Handle == Other.Handle;
 	}
+
+	UPROPERTY()
+	TEnumAsByte<EMouseCursor::Type> CursorType{EMouseCursor::Default};
+
+	UPROPERTY()
+	FGameplayTag CustomCursorIdentifier;
 
 private:
 
