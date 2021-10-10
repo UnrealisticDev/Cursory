@@ -1,3 +1,5 @@
+// © 2021 Mustafa Moiz. All rights reserved.
+
 #pragma once
 
 #include "CoreMinimal.h"

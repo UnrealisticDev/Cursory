@@ -1,3 +1,5 @@
+// © 2021 Mustafa Moiz. All rights reserved.
+
 #include "CursoryTypes.h"
 
 FCursorStackElementHandle::FCursorStackElementHandle()

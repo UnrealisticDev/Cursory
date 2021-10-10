@@ -1,4 +1,5 @@
-// Copyright Mowgl33. All rights reserved.
+// © 2021 Mustafa Moiz. All rights reserved.
+
 #include "CursoryGlobals.h"
 #include "Framework/Application/SlateApplication.h"
 #include "GenericPlatform/ICursor.h"

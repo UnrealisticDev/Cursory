@@ -1,4 +1,4 @@
-// Copyright Mowgl33. All rights reserved.
+// © 2021 Mustafa Moiz. All rights reserved.
 
 #include "CursoryFunctionLibrary.h"
 #include "GenericPlatform/ICursor.h"

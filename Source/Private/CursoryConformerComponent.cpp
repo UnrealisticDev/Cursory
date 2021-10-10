@@ -1,3 +1,5 @@
+// © 2021 Mustafa Moiz. All rights reserved.
+
 #include "CursoryConformerComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "CursoryModule.h"
