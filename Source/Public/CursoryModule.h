@@ -19,7 +19,7 @@ class ICursoryModule : public FDefaultGameModuleImpl
 public:
 	
 	/** Returns a reference to the Cursory module singleton. */
-	static inline ICursoryModule& Get()
+	static ICursoryModule& Get()
 	{
 		static ICursoryModule& singleton = FModuleManager::LoadModuleChecked<ICursoryModule>("Cursory");
 		return singleton;
