@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "GameplayTagContainer.h"
 #include "GenericPlatform/ICursor.h"
 #include "CursoryConformerComponent.generated.h"
 

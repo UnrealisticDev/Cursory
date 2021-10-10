@@ -85,33 +85,11 @@ public:
 	 */
 	void Init();
 	
-public:
-
 	/** Get the current cursor type. */
 	TOptional<EMouseCursor::Type> GetCurrentCursorType() const;
 
-	DECLARE_EVENT_TwoParams(UCursoryGlobals, FCursorChanged, EMouseCursor::Type /* Cursor */, EMouseCursor::Type /* OldCursor */);
-
-	/** Delegate for when cursor type changes. */
-	FCursorChanged CursorTypeChanged;
-
-public:
-
 	/** Get the current custom cursor identifier. */
 	FGameplayTag GetCurrentCustomCursorIdentifier() const;
-
-private:
-
-	/** 
-	 * Loads all specified cursors on Engine startup. 
-	 * Load priority:
-	 * - Windows: .ani -> .cur -> .png
-	 * - Mac: .tiff -> .png 
-	 * - Linux: .png 
-	 */
-	void LoadCustomCursors();
-
-public:
 
 	/** Gets the number of loaded custom cursors. */
 	int32 GetCustomCursorCount() const;
@@ -124,24 +102,6 @@ public:
 	 * Cursor must be set to Custom to see the effect. 
 	 */
 	void MountCustomCursor(FGameplayTag& Identifier, bool bWidget = false);
-
-private:
-
-	/** Custom cursor specs. Will be loaded on Engine startup. */
-	UPROPERTY(EditAnywhere, config, Category = "Cursors")
-	TSet<FCursorInfo> CustomCursorSpecs;
-
-	/** Loaded custom cursors. */
-	TMap<FGameplayTag, void*> LoadedCustomCursors;
-
-public:
-
-private:
-
-	/** Pushes the base cursor onto the stack. */
-	void PushBaseCursor();
-
-public:
 
 	/** Set base cursor. */
 	void ModifyBaseCursor(const FCursorStackElement& Cursor, bool bIgnoreType = false, bool bIgnoreCustom = false);
@@ -161,35 +121,34 @@ public:
 	/** Reset cursor stack (clear all stack elements except base). */
 	void ResetCursorStack();
 
+	/** Set auto focus viewport. */
+	void SetAutoFocusViewport(bool bActive);
+
+	DECLARE_EVENT_TwoParams(UCursoryGlobals, FCursorChanged, EMouseCursor::Type /* Cursor */, EMouseCursor::Type /* OldCursor */);
+
+	/** Delegate for when cursor type changes. */
+	FCursorChanged CursorTypeChanged;
+
 private:
+
+	/** 
+	 * Loads all specified cursors on Engine startup. 
+	 * Load priority:
+	 * - Windows: .ani -> .cur -> .png
+	 * - Mac: .tiff -> .png 
+	 * - Linux: .png 
+	 */
+	void LoadCustomCursors();
+
+	/** Pushes the base cursor onto the stack. */
+	void PushBaseCursor();
 
 	/** Evaluates cursor stack. */
 	void EvaluateCursorStack();
 
 	/** Clear cursor stack (all elements). */
 	void ClearCursorStack();
-
-private:
-
-	/** Cursor stack - topmost element dictates current cursor. */
-	UPROPERTY()
-	TArray<FCursorStackElement> CursorStack;
-
-	/** Cached cursor type. */
-	UPROPERTY()
-	TEnumAsByte<EMouseCursor::Type> CachedCursorType;
-
-	/** Cached custom cursor identifier. */
-	UPROPERTY()
-	FGameplayTag CachedCustomCursorIdentifier;
-
-public:
-
-	/** Set auto focus viewport. */
-	void SetAutoFocusViewport(bool bActive);
-
-private:
-
+	
 	/** Monitor viewport status. */
 	void MonitorViewportStatus();
 
@@ -201,7 +160,24 @@ private:
 	 */
 	void AuditViewportStatus(float DeltaSeconds);
 
-private:
+	/** Custom cursor specs. Will be loaded on Engine startup. */
+	UPROPERTY(EditAnywhere, config, Category = "Cursors")
+	TSet<FCursorInfo> CustomCursorSpecs;
+
+	/** Loaded custom cursors. */
+	TMap<FGameplayTag, void*> LoadedCustomCursors;
+	
+	/** Cursor stack - topmost element dictates current cursor. */
+	UPROPERTY()
+	TArray<FCursorStackElement> CursorStack;
+
+	/** Cached cursor type. */
+	UPROPERTY()
+	TEnumAsByte<EMouseCursor::Type> CachedCursorType;
+
+	/** Cached custom cursor identifier. */
+	UPROPERTY()
+	FGameplayTag CachedCustomCursorIdentifier;
 
 	/**
 	 * If true, automatically focuses viewport when directly hovered.
