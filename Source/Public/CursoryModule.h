@@ -18,12 +18,10 @@ class ICursoryModule : public FDefaultGameModuleImpl
 {
 public:
 	
-	/** Returns a reference to the Cursory module singleton. */
 	static ICursoryModule& Get()
 	{
 		return FModuleManager::LoadModuleChecked<ICursoryModule>("Cursory");
 	}
 
-	/** Returns a pointer to the module globals object. */
 	virtual UCursoryGlobals* GetGlobals() = 0;
 };

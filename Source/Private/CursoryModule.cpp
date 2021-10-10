@@ -5,8 +5,6 @@
 
 DEFINE_LOG_CATEGORY(LogCursory);
 
-#define LOCTEXT_NAMESPACE "CursoryModule"
-
 class FCursoryModule : public ICursoryModule
 {
 	void StartupModule() override;
@@ -21,17 +19,11 @@ private:
 
 void FCursoryModule::StartupModule()
 {
-	UE_LOG(LogCursory, Log, TEXT("Cursory module loaded."));
-
-	// Initialize globals.
 	GetGlobals()->Init();
 }
 
 void FCursoryModule::ShutdownModule()
 {
-	UE_LOG(LogCursory, Log, TEXT("Cursory module unloaded."));
-
-	// Uninitialize globals.
 	if (Globals)
 	{
 		Globals->RemoveFromRoot();
@@ -51,5 +43,3 @@ UCursoryGlobals* FCursoryModule::GetGlobals()
 }
 
 IMPLEMENT_GAME_MODULE(FCursoryModule, Cursory);
-
-#undef LOCTEXT_NAMESPACE
