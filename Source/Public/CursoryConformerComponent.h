@@ -26,21 +26,10 @@ public:
 
 private:
 
-	/** Conform initial cursor state. */
 	void ConformInitialCursorState();
-
-	/** Listen for cursor changes. */
 	void ListenForCursorChanges();
-
-	/** Stop listening for cursor changes. */
 	void StopListeningForCursorChanges();
-
-	/** Callback handle. */
-	FDelegateHandle CursorChangeCallbackHandle;
-
-	/** 
-	 * Callback for when Cursory cursor changes.
-	 * Updates player cursor.
-	 */
 	void OnCursorChange(EMouseCursor::Type Cursor, EMouseCursor::Type OldCursor);
+
+	FDelegateHandle CursorChangeCallbackHandle;
 };
