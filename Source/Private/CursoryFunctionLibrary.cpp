@@ -4,22 +4,11 @@
 #include "GenericPlatform/ICursor.h"
 #include "CursoryModule.h"
 #include "GameFramework/PlayerController.h"
-#include "Kismet/GameplayStatics.h"
 #include "CursorySystem.h"
 #include "Widgets/SViewport.h"
 #include "Components/Widget.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetTree.h"
-
-void UCursoryFunctionLibrary::UseStandardCursor(const UObject* WorldContextObject, EMouseCursor::Type Cursor)
-{
-	// Stub
-}
-
-void UCursoryFunctionLibrary::UseCustomCursor(const UObject* WorldContextObject, FGameplayTag Identifier)
-{
-	// Stub
-}
 
 void UCursoryFunctionLibrary::ResetBaseCursor()
 {

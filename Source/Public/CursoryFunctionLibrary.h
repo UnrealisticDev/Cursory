@@ -24,12 +24,6 @@ class UCursoryFunctionLibrary : public UBlueprintFunctionLibrary
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "Cursory", meta = (WorldContext = "WorldContextObject", DeprecatedFunction, DeprecationMessage="Use UseBaseStandardCursor() instead."))
-	static void UseStandardCursor(const UObject* WorldContextObject, EMouseCursor::Type Cursor);
-
-	UFUNCTION(BlueprintCallable, Category = "Cursory", meta = (WorldContext = "WorldContextObject", DeprecatedFunction, DeprecationMessage = "Use UseBaseCustomCursor() instead."))
-	static void UseCustomCursor(const UObject* WorldContextObject, FGameplayTag Identifier);
-
 	/** Reset the base cursor to default. */
 	UFUNCTION(BlueprintCallable, Category = "Cursory")
 	static void ResetBaseCursor();
