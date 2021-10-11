@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DeveloperSettings.h"
 #include "CursoryTypes.h"
 #include "CursorySettings.generated.h"
 
