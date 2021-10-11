@@ -16,9 +16,6 @@ class AGameModeBase;
  * Loads cursors on Engine init and allows user to
  * use cursors at runtime. Loaded cursors are handled by the underlying platform, 
  * and do not need to be unloaded or deleted manually.
- * 
- * Note: The "config=..." value specifies the Project Settings category.
- * The "DisplayName=..." value specifies the Project Settings section name.
  */
 UCLASS()
 class CURSORY_API UCursorySystem : public UObject
