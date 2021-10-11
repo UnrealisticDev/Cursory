@@ -27,9 +27,7 @@ void UCursoryConformerComponent::Deactivate()
 
 void UCursoryConformerComponent::ConformInitialCursorState()
 {
-	APlayerController* PlayerOwner = Cast<APlayerController>(GetOwner());
-	
-	if (PlayerOwner)
+	if (APlayerController* PlayerOwner = Cast<APlayerController>(GetOwner()))
 	{
 		PlayerOwner->CurrentMouseCursor = ICursoryModule::Get().GetCurrentCursorType().GetValue();
 	}

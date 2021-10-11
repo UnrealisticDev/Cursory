@@ -21,11 +21,11 @@ class UCursoryConformerComponent : public UActorComponent
 public:
 
 	UCursoryConformerComponent();
-	void Activate(bool bReset) override;
-	void Deactivate() override;
 
 private:
 
+	void Activate(bool bReset) override;
+	void Deactivate() override;
 	void ConformInitialCursorState();
 	void ListenForCursorChanges();
 	void StopListeningForCursorChanges();
