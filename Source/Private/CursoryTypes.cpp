@@ -4,7 +4,7 @@
 
 FCursorStackElementHandle FCursorStackElementHandle::Generate()
 {
-	static int32 Id = 0;
+	static int32 Id{0};
 
 	FCursorStackElementHandle Handle;
 	Handle.Id = Id++;

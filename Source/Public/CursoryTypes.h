@@ -93,7 +93,7 @@ struct FCursorStackElement
 
 public:
 
-	FCursorStackElement() {}
+	FCursorStackElement() = default;
 	FCursorStackElement(FCursorStackElementHandle InHandle);
 
 	FCursorStackElementHandle GetHandle() const;
