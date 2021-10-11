@@ -10,7 +10,7 @@
 /**
  * Add this to a PlayerController to conform its cursor to the one 
  * dictated by the Cursory system. This allows you to change cursors
- * in one central location (CursoryGlobals), instead of in multiple 
+ * in one central location (Cursory System), instead of in multiple 
  * locations.
  */
 UCLASS(meta=(BlueprintSpawnableComponent = true))

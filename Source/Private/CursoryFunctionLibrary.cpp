@@ -2,15 +2,11 @@
 
 #include "CursoryFunctionLibrary.h"
 #include "GenericPlatform/ICursor.h"
-#include "Modules/ModuleManager.h"
 #include "CursoryModule.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
-#include "CursoryGlobals.h"
-#include "Framework/Application/SlateApplication.h"
+#include "CursorySystem.h"
 #include "Widgets/SViewport.h"
-#include "Engine/World.h"
-#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Widget.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetTree.h"
@@ -43,7 +39,7 @@ void UCursoryFunctionLibrary::UseBaseStandardCursor(EMouseCursor::Type Cursor)
 		NewBaseCursor.CursorType = Cursor;
 	}
 
-	ICursoryModule::Get().GetGlobals()->ModifyBaseCursor(NewBaseCursor);
+	ICursoryModule::Get().ModifyBaseCursor(NewBaseCursor);
 }
 
 void UCursoryFunctionLibrary::UseBaseCustomCursor(FGameplayTag Identifier)
@@ -54,7 +50,7 @@ void UCursoryFunctionLibrary::UseBaseCustomCursor(FGameplayTag Identifier)
 		NewBaseCursor.CustomCursorIdentifier = Identifier;
 	}
 
-	ICursoryModule::Get().GetGlobals()->ModifyBaseCursor(NewBaseCursor);
+	ICursoryModule::Get().ModifyBaseCursor(NewBaseCursor);
 }
 
 FCursorStackElementHandle UCursoryFunctionLibrary::PushStandardCursor(EMouseCursor::Type Cursor)
@@ -64,7 +60,7 @@ FCursorStackElementHandle UCursoryFunctionLibrary::PushStandardCursor(EMouseCurs
 		NewCursor.CursorType = Cursor;
 	}
 
-	return ICursoryModule::Get().GetGlobals()->PushCursor(NewCursor);
+	return ICursoryModule::Get().PushCursor(NewCursor);
 }
 
 FCursorStackElementHandle UCursoryFunctionLibrary::PushCustomCursor(FGameplayTag Identifier)
@@ -75,7 +71,7 @@ FCursorStackElementHandle UCursoryFunctionLibrary::PushCustomCursor(FGameplayTag
 		NewCursor.CustomCursorIdentifier = Identifier;
 	}
 
-	return ICursoryModule::Get().GetGlobals()->PushCursor(NewCursor);
+	return ICursoryModule::Get().PushCursor(NewCursor);
 }
 
 void UCursoryFunctionLibrary::SetStandardCursorByHandle(FCursorStackElementHandle Handle, EMouseCursor::Type Cursor)
@@ -85,7 +81,7 @@ void UCursoryFunctionLibrary::SetStandardCursorByHandle(FCursorStackElementHandl
 		NewCursor.CursorType = Cursor;
 	}
 
-	ICursoryModule::Get().GetGlobals()->ModifyCursorByHandle(Handle, NewCursor);
+	ICursoryModule::Get().ModifyCursorByHandle(Handle, NewCursor);
 }
 
 void UCursoryFunctionLibrary::SetCustomCursorByHandle(FCursorStackElementHandle Handle, FGameplayTag Identifier)
@@ -96,22 +92,22 @@ void UCursoryFunctionLibrary::SetCustomCursorByHandle(FCursorStackElementHandle 
 		NewCursor.CustomCursorIdentifier = Identifier;
 	}
 
-	ICursoryModule::Get().GetGlobals()->ModifyCursorByHandle(Handle, NewCursor);
+	ICursoryModule::Get().ModifyCursorByHandle(Handle, NewCursor);
 }
 
 void UCursoryFunctionLibrary::RemoveCursorByHandle(FCursorStackElementHandle Handle)
 {
-	ICursoryModule::Get().GetGlobals()->RemoveCursorByHandle(Handle);
+	ICursoryModule::Get().RemoveCursorByHandle(Handle);
 }
 
 void UCursoryFunctionLibrary::PopCursor()
 {
-	ICursoryModule::Get().GetGlobals()->PopCursor();
+	ICursoryModule::Get().PopCursor();
 }
 
 void UCursoryFunctionLibrary::ResetCursorStack()
 {
-	ICursoryModule::Get().GetGlobals()->ResetCursorStack();
+	ICursoryModule::Get().ResetCursorStack();
 }
 
 void UCursoryFunctionLibrary::ConformSWidgetToCursory(SWidget* Widget)
@@ -119,7 +115,7 @@ void UCursoryFunctionLibrary::ConformSWidgetToCursory(SWidget* Widget)
 	if (Widget)
 	{
 		TAttribute<TOptional<EMouseCursor::Type>> Callback;
-		Callback.BindUObject(ICursoryModule::Get().GetGlobals(), &UCursoryGlobals::GetCurrentCursorType);
+		Callback.BindUObject(&ICursoryModule::Get(), &UCursorySystem::GetCurrentCursorType);
 		Widget->SetCursor(Callback);
 	}
 }
@@ -132,7 +128,7 @@ void UCursoryFunctionLibrary::ConformWidgetToCursory(UWidget* Widget)
 		if (UnderlyingWidget.IsValid())
 		{
 			TAttribute<TOptional<EMouseCursor::Type>> Callback;
-			Callback.BindUObject(ICursoryModule::Get().GetGlobals(), &UCursoryGlobals::GetCurrentCursorType);
+			Callback.BindUObject(&ICursoryModule::Get(), &UCursorySystem::GetCurrentCursorType);
 			UnderlyingWidget->SetCursor(Callback);
 		}
 	}
@@ -172,10 +168,10 @@ void UCursoryFunctionLibrary::ConformWidgetToCursoryRecursive(UUserWidget* Widge
 
 void UCursoryFunctionLibrary::PauseAutoFocusViewport()
 {
-	ICursoryModule::Get().GetGlobals()->SetAutoFocusViewport(true);
+	ICursoryModule::Get().SetAutoFocusViewport(true);
 }
 
 void UCursoryFunctionLibrary::ResumeAutoFocusViewport()
 {
-	ICursoryModule::Get().GetGlobals()->SetAutoFocusViewport(false);
+	ICursoryModule::Get().SetAutoFocusViewport(false);
 }

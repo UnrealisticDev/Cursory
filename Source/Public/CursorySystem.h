@@ -6,7 +6,7 @@
 #include "UObject/Object.h"
 #include "GameplayTagContainer.h"
 #include "CursoryTypes.h"
-#include "CursoryGlobals.generated.h"
+#include "CursorySystem.generated.h"
 
 class APlayerController;
 class AGameModeBase;
@@ -21,7 +21,7 @@ class AGameModeBase;
  * The "DisplayName=..." value specifies the Project Settings section name.
  */
 UCLASS()
-class CURSORY_API UCursoryGlobals : public UObject
+class CURSORY_API UCursorySystem : public UObject
 {
 	GENERATED_BODY()
 
@@ -72,7 +72,7 @@ public:
 	/** Set auto focus viewport. */
 	void SetAutoFocusViewport(bool bActive);
 
-	DECLARE_EVENT_TwoParams(UCursoryGlobals, FCursorChanged, EMouseCursor::Type /* Cursor */, EMouseCursor::Type /* OldCursor */);
+	DECLARE_EVENT_TwoParams(UCursorySystem, FCursorChanged, EMouseCursor::Type /* Cursor */, EMouseCursor::Type /* OldCursor */);
 
 	/** Delegate for when cursor type changes. */
 	FCursorChanged CursorTypeChanged;

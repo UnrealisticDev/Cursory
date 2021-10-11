@@ -6,7 +6,7 @@
 #include "Modules/ModuleManager.h"
 #include "Logging/LogMacros.h"
 
-class UCursoryGlobals;
+class UCursorySystem;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCursory, Log, All);
 
@@ -17,11 +17,13 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCursory, Log, All);
 class ICursoryModule : public FDefaultGameModuleImpl
 {
 public:
-	
-	static ICursoryModule& Get()
+
+	static UCursorySystem& Get()
 	{
-		return FModuleManager::LoadModuleChecked<ICursoryModule>("Cursory");
+		return FModuleManager::LoadModuleChecked<ICursoryModule>("Cursory").GetSystem();
 	}
 
-	virtual UCursoryGlobals* GetGlobals() = 0;
+private:
+	
+	virtual UCursorySystem& GetSystem() = 0;
 };

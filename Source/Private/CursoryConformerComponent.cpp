@@ -3,7 +3,7 @@
 #include "CursoryConformerComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "CursoryModule.h"
-#include "CursoryGlobals.h"
+#include "CursorySystem.h"
 
 UCursoryConformerComponent::UCursoryConformerComponent()
 {
@@ -27,29 +27,22 @@ void UCursoryConformerComponent::Deactivate()
 
 void UCursoryConformerComponent::ConformInitialCursorState()
 {
-	UCursoryGlobals* Globals = ICursoryModule::Get().GetGlobals();
 	APlayerController* PlayerOwner = Cast<APlayerController>(GetOwner());
 	
-	if (Globals && PlayerOwner)
+	if (PlayerOwner)
 	{
-		PlayerOwner->CurrentMouseCursor = Globals->GetCurrentCursorType().GetValue();
+		PlayerOwner->CurrentMouseCursor = ICursoryModule::Get().GetCurrentCursorType().GetValue();
 	}
 }
 
 void UCursoryConformerComponent::ListenForCursorChanges()
 {
-	if (UCursoryGlobals* Globals = ICursoryModule::Get().GetGlobals())
-	{
-		CursorChangeCallbackHandle = Globals->CursorTypeChanged.AddUObject(this, &UCursoryConformerComponent::OnCursorChange);
-	}
+	CursorChangeCallbackHandle = ICursoryModule::Get().CursorTypeChanged.AddUObject(this, &UCursoryConformerComponent::OnCursorChange);
 }
 
 void UCursoryConformerComponent::StopListeningForCursorChanges()
 {
-	if (UCursoryGlobals* Globals = ICursoryModule::Get().GetGlobals())
-	{
-		Globals->CursorTypeChanged.Remove(CursorChangeCallbackHandle);
-	}
+	ICursoryModule::Get().CursorTypeChanged.Remove(CursorChangeCallbackHandle);
 }
 
 void UCursoryConformerComponent::OnCursorChange(EMouseCursor::Type Cursor, EMouseCursor::Type OldCursor)

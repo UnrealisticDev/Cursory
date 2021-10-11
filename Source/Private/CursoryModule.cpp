@@ -1,7 +1,7 @@
 // © 2021 Mustafa Moiz. All rights reserved.
 
 #include "CursoryModule.h"
-#include "CursoryGlobals.h"
+#include "CursorySystem.h"
 
 DEFINE_LOG_CATEGORY(LogCursory);
 
@@ -10,29 +10,29 @@ class FCursoryModule : public ICursoryModule
 	void StartupModule() override;
 	void ShutdownModule() override;
 
-	UCursoryGlobals* GetGlobals() override;
+	UCursorySystem& GetSystem() override;
 	
-	UCursoryGlobals* Globals{nullptr};
+	UCursorySystem* CursorySystem{nullptr};
 };
 
 void FCursoryModule::StartupModule()
 {
-	Globals = NewObject<UCursoryGlobals>(GetTransientPackage(), UCursoryGlobals::StaticClass(), NAME_None);
-	Globals->AddToRoot();
-	Globals->Init();
+	CursorySystem = NewObject<UCursorySystem>(GetTransientPackage(), UCursorySystem::StaticClass(), NAME_None);
+	CursorySystem->AddToRoot();
+	CursorySystem->Init();
 }
 
 void FCursoryModule::ShutdownModule()
 {
-	if (Globals)
+	if (CursorySystem)
 	{
-		Globals->RemoveFromRoot();
+		CursorySystem->RemoveFromRoot();
 	}
 }
 
-UCursoryGlobals* FCursoryModule::GetGlobals()
+UCursorySystem& FCursoryModule::GetSystem()
 {
-	return Globals;
+	return *CursorySystem;
 }
 
 IMPLEMENT_GAME_MODULE(FCursoryModule, Cursory);

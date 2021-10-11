@@ -1,6 +1,6 @@
 // © 2021 Mustafa Moiz. All rights reserved.
 
-#include "CursoryGlobals.h"
+#include "CursorySystem.h"
 #include "Framework/Application/SlateApplication.h"
 #include "GenericPlatform/ICursor.h"
 #include "Misc/Paths.h"
@@ -25,7 +25,7 @@
 
 #define LOCTEXT_NAMESPACE "CursoryGlobals"
 
-void UCursoryGlobals::Init()
+void UCursorySystem::Init()
 {
 	static auto bInitialized = false;
 	if (bInitialized)
@@ -180,17 +180,17 @@ struct FPNGConverter
 	}
 };
 
-TOptional<EMouseCursor::Type> UCursoryGlobals::GetCurrentCursorType() const
+TOptional<EMouseCursor::Type> UCursorySystem::GetCurrentCursorType() const
 {
 	return CachedCursorType.GetValue();
 }
 
-FGameplayTag UCursoryGlobals::GetCurrentCustomCursorIdentifier() const
+FGameplayTag UCursorySystem::GetCurrentCustomCursorIdentifier() const
 {
 	return CachedCustomCursorIdentifier;
 }
 
-void UCursoryGlobals::LoadCustomCursors()
+void UCursorySystem::LoadCustomCursors()
 {
 	LoadedCustomCursors.Reset();
 
@@ -226,12 +226,12 @@ void UCursoryGlobals::LoadCustomCursors()
 	}
 }
 
-int32 UCursoryGlobals::GetCustomCursorCount() const
+int32 UCursorySystem::GetCustomCursorCount() const
 {
 	return LoadedCustomCursors.Num();
 }
 
-FGameplayTagContainer UCursoryGlobals::GetCustomCursorOptions() const
+FGameplayTagContainer UCursorySystem::GetCustomCursorOptions() const
 {
 	FGameplayTagContainer Options;
 	for (const auto& LoadedCursorPair : LoadedCustomCursors) 
@@ -241,7 +241,7 @@ FGameplayTagContainer UCursoryGlobals::GetCustomCursorOptions() const
 	return Options;
 }
 
-void UCursoryGlobals::MountCustomCursor(FGameplayTag& Identifier, bool bWidget /* = false */)
+void UCursorySystem::MountCustomCursor(FGameplayTag& Identifier, bool bWidget /* = false */)
 {
 	if (auto Cursor = LoadedCustomCursors.Find(Identifier))
 	{
@@ -254,7 +254,7 @@ void UCursoryGlobals::MountCustomCursor(FGameplayTag& Identifier, bool bWidget /
 	}
 }
 
-void UCursoryGlobals::PushBaseCursor()
+void UCursorySystem::PushBaseCursor()
 {
 	FCursorStackElement BaseCursor(FCursorStackElementHandle::Generate());
 	{
@@ -265,7 +265,7 @@ void UCursoryGlobals::PushBaseCursor()
 	EvaluateCursorStack();
 }
 
-void UCursoryGlobals::ModifyBaseCursor(const FCursorStackElement& Cursor, bool bIgnoreType /*= false*/, bool bIgnoreCustom /*= false*/)
+void UCursorySystem::ModifyBaseCursor(const FCursorStackElement& Cursor, bool bIgnoreType /*= false*/, bool bIgnoreCustom /*= false*/)
 {
 	if (!bIgnoreType)
 	{
@@ -280,7 +280,7 @@ void UCursoryGlobals::ModifyBaseCursor(const FCursorStackElement& Cursor, bool b
 	EvaluateCursorStack();
 }
 
-FCursorStackElementHandle UCursoryGlobals::PushCursor(FCursorStackElement Cursor)
+FCursorStackElementHandle UCursorySystem::PushCursor(FCursorStackElement Cursor)
 {
 	if (Cursor.GetHandle().IsValid())
 	{
@@ -295,7 +295,7 @@ FCursorStackElementHandle UCursoryGlobals::PushCursor(FCursorStackElement Cursor
 	}
 }
 
-void UCursoryGlobals::ModifyCursorByHandle(FCursorStackElementHandle Handle, FCursorStackElement NewCursor)
+void UCursorySystem::ModifyCursorByHandle(FCursorStackElementHandle Handle, FCursorStackElement NewCursor)
 {
 	if (Handle.IsValid() && CursorStack.Contains(Handle))
 	{
@@ -305,7 +305,7 @@ void UCursoryGlobals::ModifyCursorByHandle(FCursorStackElementHandle Handle, FCu
 	}
 }
 
-void UCursoryGlobals::RemoveCursorByHandle(FCursorStackElementHandle Handle)
+void UCursorySystem::RemoveCursorByHandle(FCursorStackElementHandle Handle)
 {
 	if (Handle.IsValid())
 	{
@@ -314,7 +314,7 @@ void UCursoryGlobals::RemoveCursorByHandle(FCursorStackElementHandle Handle)
 	}
 }
 
-void UCursoryGlobals::PopCursor()
+void UCursorySystem::PopCursor()
 {
 	if (CursorStack.Num() > 1)
 	{
@@ -323,7 +323,7 @@ void UCursoryGlobals::PopCursor()
 	}
 }
 
-void UCursoryGlobals::ResetCursorStack()
+void UCursorySystem::ResetCursorStack()
 {
 	while (CursorStack.Num() > 1)
 	{
@@ -332,7 +332,7 @@ void UCursoryGlobals::ResetCursorStack()
 	EvaluateCursorStack();
 }
 
-void UCursoryGlobals::EvaluateCursorStack()
+void UCursorySystem::EvaluateCursorStack()
 {
 	FCursorStackElement& TopCursor = CursorStack.Last(0);
 
@@ -353,23 +353,23 @@ void UCursoryGlobals::EvaluateCursorStack()
 	}
 }
 
-void UCursoryGlobals::ClearCursorStack()
+void UCursorySystem::ClearCursorStack()
 {
 	CursorStack.Empty();
 	PushBaseCursor();
 }
 
-void UCursoryGlobals::SetAutoFocusViewport(bool bActive)
+void UCursorySystem::SetAutoFocusViewport(bool bActive)
 {
 	bAutoFocusViewport = bActive;
 }
 
-void UCursoryGlobals::MonitorViewportStatus()
+void UCursorySystem::MonitorViewportStatus()
 {
-	FSlateApplication::Get().OnPreTick().AddUObject(this, &UCursoryGlobals::AuditViewportStatus);
+	FSlateApplication::Get().OnPreTick().AddUObject(this, &UCursorySystem::AuditViewportStatus);
 }
 
-void UCursoryGlobals::AuditViewportStatus(float DeltaSeconds)
+void UCursorySystem::AuditViewportStatus(float DeltaSeconds)
 {
 	FSlateApplication& SlateApp = FSlateApplication::Get();
 	SWidget* GameViewport = SlateApp.GetGameViewport().Get();
